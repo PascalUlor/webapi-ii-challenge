@@ -14,4 +14,6 @@ route.post("/:id/comments", dbMethod.postComments);
 
 route.put("/:id", dbMethod.updatePost);
 
+route.delete("/:id", dbMethod.deletePost);
+
 module.exports = route;

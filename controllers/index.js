@@ -147,7 +147,30 @@ const updatePost = async (req, res) => {
   } catch (err) {
     return res.status(400).json({
       status: 500,
-      error: "There was an error while saving the comment to the database"
+      error: "The post information could not be modified."
+    });
+  }
+};
+
+const deletePost = async (req, res) => {
+  try {
+    const PostId = req.params.id;
+    const Post = await Blog.findById(PostId);
+    if (Post.length) {
+      const removePost = await Blog.remove(PostId);
+      return res.status(200).json({
+        status: 200,
+        data: removePost
+      });
+    }
+    return res.status(404).json({
+      status: 404,
+      message: "The post with the specified ID does not exist."
+    });
+  } catch (err) {
+    return res.status(400).json({
+      status: 500,
+      error: "The post could not be removed"
     });
   }
 };
@@ -158,5 +181,6 @@ module.exports = {
   createPost,
   getComments,
   postComments,
-  updatePost
+  updatePost,
+  deletePost
 };
