@@ -10,4 +10,6 @@ route.get("/:id/comments", dbMethod.getComments);
 
 route.post("/", dbMethod.createPost);
 
+route.post("/:id/comments", dbMethod.postComments);
+
 module.exports = route;

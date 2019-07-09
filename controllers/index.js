@@ -49,9 +49,9 @@ const getPostById = (req, res) => {
 const createPost = async (req, res) => {
   try {
     const { title, contents } = req.body;
-    const newPostId = await Blog.insert({ title, contents });
-    console.log(newPostId);
-    if (newPostId & !title & !contents) {
+    if (title && contents) {
+      const newPostId = await Blog.insert({ title, contents });
+      console.log(newPostId);
       return getById(res, newPostId.id, 201);
     }
     return res.status(400).json({
@@ -69,23 +69,66 @@ const createPost = async (req, res) => {
 const getComments = async (req, res) => {
   try {
     const PostId = req.params.id;
-    const comments = await Blog.findPostComments(PostId);
-    if (comments) {
-      res.status(200).json({
+    const Post = await Blog.findById(PostId);
+    if (Post.length !== 0) {
+      const comments = await Blog.findPostComments(Post[0].id);
+      if (comments.length !== 0) {
+        return res.status(200).json({
+          status: 200,
+          data: comments
+        });
+      }
+      return res.status(200).json({
         status: 200,
-        data: comments
+        message: "This Post has no comments"
       });
     }
-    res.status(404).json({
+    return res.status(404).json({
       status: 404,
       message: "The post with the specified ID does not exist."
     });
   } catch (err) {
-    res.status(500).json({
+    return res.status(500).json({
       status: 500,
       error: "The comments information could not be retrieved."
     });
   }
 };
 
-module.exports = { getPosts, getPostById, createPost, getComments };
+const postComments = async (req, res) => {
+  try {
+    const { text } = req.body;
+    const PostId = req.params.id;
+    const Post = await Blog.findById(PostId);
+    if (Post.length) {
+      if (text) {
+        const newComments = await Blog.insertComment({ text, post_id: PostId });
+        return res.status(200).json({
+          status: 200,
+          data: newComments
+        });
+      }
+      return res.status(400).json({
+        status: 400,
+        errorMessage: "Please provide text for the comment."
+      });
+    }
+    return res.status(404).json({
+      status: 404,
+      message: "The post with the specified ID does not exist."
+    });
+  } catch (err) {
+    return res.status(400).json({
+      status: 500,
+      error: "There was an error while saving the comment to the database"
+    });
+  }
+};
+
+module.exports = {
+  getPosts,
+  getPostById,
+  createPost,
+  getComments,
+  postComments
+};
