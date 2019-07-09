@@ -46,4 +46,24 @@ const getPostById = (req, res) => {
   getById(res, id, 200);
 };
 
-module.exports = { getPosts, getPostById };
+const createPost = async (req, res) => {
+  try {
+    const { title, contents } = req.body;
+    const newPostId = await Blog.insert({ title, contents });
+    console.log(newPostId);
+    if (newPostId) {
+      return getById(res, newPostId.id, 201);
+    }
+    return res.status(400).json({
+      status: 400,
+      errorMessage: "Please provide title and contents for the post."
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      error: "There was an error while saving the post to the database"
+    });
+  }
+};
+
+module.exports = { getPosts, getPostById, createPost };
