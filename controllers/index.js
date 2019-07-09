@@ -125,10 +125,38 @@ const postComments = async (req, res) => {
   }
 };
 
+const updatePost = async (req, res) => {
+  try {
+    const { title, contents } = req.body;
+    const PostId = req.params.id;
+    const Post = await Blog.findById(PostId);
+    if (Post.length) {
+      if (title && contents) {
+        const postUpdate = await Blog.update(PostId, { title, contents });
+        return getById(res, PostId, 200);
+      }
+      return res.status(400).json({
+        status: 400,
+        errorMessage: "Please provide title and contents for the post."
+      });
+    }
+    return res.status(404).json({
+      status: 404,
+      message: "The post with the specified ID does not exist."
+    });
+  } catch (err) {
+    return res.status(400).json({
+      status: 500,
+      error: "There was an error while saving the comment to the database"
+    });
+  }
+};
+
 module.exports = {
   getPosts,
   getPostById,
   createPost,
   getComments,
-  postComments
+  postComments,
+  updatePost
 };
