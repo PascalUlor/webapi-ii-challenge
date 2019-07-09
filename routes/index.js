@@ -6,6 +6,8 @@ route.get("/", dbMethod.getPosts);
 
 route.get("/:id", dbMethod.getPostById);
 
+route.get("/:id/comments", dbMethod.getComments);
+
 route.post("/", dbMethod.createPost);
 
 module.exports = route;

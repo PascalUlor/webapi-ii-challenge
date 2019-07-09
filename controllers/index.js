@@ -43,7 +43,7 @@ const getById = async (res, id, statusCode) => {
 const getPostById = (req, res) => {
   const id = req.params.id;
   console.log(id);
-  getById(res, id, 200);
+  return getById(res, id, 200);
 };
 
 const createPost = async (req, res) => {
@@ -51,7 +51,7 @@ const createPost = async (req, res) => {
     const { title, contents } = req.body;
     const newPostId = await Blog.insert({ title, contents });
     console.log(newPostId);
-    if (newPostId) {
+    if (newPostId & !title & !contents) {
       return getById(res, newPostId.id, 201);
     }
     return res.status(400).json({
@@ -66,4 +66,26 @@ const createPost = async (req, res) => {
   }
 };
 
-module.exports = { getPosts, getPostById, createPost };
+const getComments = async (req, res) => {
+  try {
+    const PostId = req.params.id;
+    const comments = await Blog.findPostComments(PostId);
+    if (comments) {
+      res.status(200).json({
+        status: 200,
+        data: comments
+      });
+    }
+    res.status(404).json({
+      status: 404,
+      message: "The post with the specified ID does not exist."
+    });
+  } catch (err) {
+    res.status(500).json({
+      status: 500,
+      error: "The comments information could not be retrieved."
+    });
+  }
+};
+
+module.exports = { getPosts, getPostById, createPost, getComments };
