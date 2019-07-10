@@ -1,11 +1,15 @@
 const express = require("express");
+const cors = require("cors");
 const router = require("./routes");
+
 const server = express();
 
 const port = 8000 || process.env;
 
 server.use(express.json());
 server.use("/api/posts", router);
+
+server.use(cors());
 
 /**
  * All wrong routes
